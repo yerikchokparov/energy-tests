@@ -1,0 +1,371 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Уровень энергии</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Бланк-опросник: четыре экрана по видам энергии, в конце счёт утечек и разбивка */
+:root{
+  --paper:#F4F1EB; --card:#FFFFFF; --line:#DDD5C8;
+  --ink:#19242B; --dim:#5E6A73;
+  --acc:#A3562C; --acc-soft:#F2E3D8; --acc-ink:#8C4825;
+  --ok:#4E7A5A;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#141E26; --card:#1D2A33; --line:#33454F;
+    --ink:#F2EFE9; --dim:#9FB0BA;
+    --acc:#D98A5B; --acc-soft:#33231B; --acc-ink:#E8A478;
+    --ok:#7FA98A;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141E26; --card:#1D2A33; --line:#33454F;
+  --ink:#F2EFE9; --dim:#9FB0BA;
+  --acc:#D98A5B; --acc-soft:#33231B; --acc-ink:#E8A478;
+  --ok:#7FA98A;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{width:100%;max-width:680px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:28px 56px}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(30px,7vw,42px);line-height:1.1;
+  margin:0 0 14px;letter-spacing:-.015em;text-wrap:balance}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(24px,5.5vw,32px);line-height:1.15;
+  margin:0 0 6px;letter-spacing:-.01em;text-wrap:balance}
+p{margin:0 0 14px}
+p:last-child{margin-bottom:0}
+.lede{font-size:17px;color:var(--dim);max-width:60ch}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--acc);margin:0 0 10px}
+
+.note{margin-top:22px;padding:20px 22px;border-radius:14px;background:var(--card);
+  border:1px solid var(--line);font-size:15.5px;color:var(--dim)}
+
+.btn{appearance:none;border:0;cursor:pointer;font-family:var(--sans);font-weight:600;
+  font-size:16px;padding:15px 26px;border-radius:12px;background:var(--acc);color:#fff;
+  line-height:1.2}
+.btn:hover{background:var(--acc-ink)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--dim);border:1px solid var(--line);padding:15px 20px}
+.btn.ghost:hover{background:var(--card);color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px;align-items:center}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:10px}
+.step{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+.bar{height:4px;border-radius:2px;background:var(--line);overflow:hidden;margin-bottom:24px}
+.bar i{display:block;height:100%;background:var(--acc);transition:width .3s ease}
+
+.q{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:18px 18px 14px;margin-bottom:10px}
+.q.yes{border-color:var(--acc);background:var(--acc-soft)}
+.q p{font-size:15.5px;line-height:1.45;margin:0 0 14px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.opt{appearance:none;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:15px;
+  padding:12px 0;border-radius:10px;border:1px solid var(--line);background:transparent;
+  color:var(--ink);line-height:1.1}
+.opt:hover{border-color:var(--acc)}
+.opt[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+
+.score{display:flex;align-items:baseline;gap:14px;margin:4px 0 0}
+.score b{font-family:var(--serif);font-weight:700;font-size:clamp(56px,16vw,86px);line-height:.9;
+  color:var(--acc);font-variant-numeric:tabular-nums}
+.score span{font-size:15px;color:var(--dim);max-width:18ch}
+.verdict{margin-top:18px;padding:20px 22px;border-radius:14px;background:var(--acc-soft);
+  border:1px solid var(--acc);font-size:16px;line-height:1.5}
+
+.kinds{display:grid;gap:12px;margin-top:10px}
+.kind{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px 18px}
+.kind.hot{border-color:var(--acc)}
+.kHead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:9px}
+.kHead h3{font-family:var(--sans);font-weight:600;font-size:15.5px;margin:0}
+.kHead b{font-family:var(--serif);font-size:17px;color:var(--acc);font-variant-numeric:tabular-nums}
+.track{height:9px;border-radius:5px;background:var(--line);overflow:hidden}
+.track i{display:block;height:100%;background:var(--acc);border-radius:5px}
+.kind p{font-size:14px;color:var(--dim);margin:9px 0 0}
+
+.cta{margin-top:34px;padding:26px 24px;border-radius:16px;background:var(--card);
+  border:1px solid var(--line)}
+.msg{margin-top:14px;padding:15px 17px;border-radius:11px;background:var(--paper);
+  border:1px dashed var(--line);font-size:15px;color:var(--dim);line-height:1.45}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<section id="intro">
+  <p class="eyebrow">Личная эффективность и энергия</p>
+  <h1>Где утекает ваша энергия</h1>
+  <p class="lede">28 утверждений о том, как устроен ваш обычный день. На каждое — «да» или
+    «нет». Займёт три минуты.</p>
+  <p class="lede" style="margin-top:14px">В конце вы увидите, сколько у вас утечек и по какому
+    виду энергии их больше всего: физической, эмоциональной, ментальной или духовной.</p>
+  <div class="note">Отвечайте честно и быстро. Тест показывает не то, каким вы хотите быть,
+    а то, как есть на сегодня.</div>
+  <div class="row"><button class="btn" id="start">Начать</button></div>
+</section>
+
+<section id="quiz" hidden>
+  <div class="top">
+    <p class="eyebrow" id="kName" style="margin:0"></p>
+    <span class="step" id="kStep"></span>
+  </div>
+  <div class="bar"><i id="kBar" style="width:0%"></i></div>
+  <div id="kBody"></div>
+  <div class="row">
+    <button class="btn" id="next" disabled>Дальше</button>
+    <button class="btn ghost" id="back">Назад</button>
+    <span class="step" id="left"></span>
+  </div>
+</section>
+
+<section id="result" hidden>
+  <p class="eyebrow">Результат</p>
+  <h2>Ваши утечки энергии</h2>
+  <div class="score"><b id="total">—</b><span id="outOf">из 28 утверждений про вас</span></div>
+  <div class="verdict" id="verdict"></div>
+
+  <hr>
+
+  <h2>По видам энергии</h2>
+  <p class="lede">Где утечек больше, там и начинается работа.</p>
+  <div class="kinds" id="kinds"></div>
+
+  <div class="cta">
+    <h2 style="font-size:24px">Что с этим делать</h2>
+    <p style="color:var(--dim)">Цифра показывает, сколько сил уходит впустую. Но не показывает,
+      какая утечка главная — а закрывать надо с неё, иначе остальные откроются снова.</p>
+    <p style="color:var(--dim)">Я провожу разбор: час по зуму, смотрим ваш результат, находим
+      главную утечку и собираем два-три шага на ближайшую неделю.</p>
+    <p id="deadline" style="font-weight:600"></p>
+    <div class="row" style="margin-top:20px">
+      <a class="btn" id="wa" href="#" target="_blank" rel="noopener">Написать в WhatsApp</a>
+      <button class="btn ghost" id="copy">Скопировать сообщение</button>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div class="row"><button class="btn ghost" id="again">Пройти заново</button></div>
+</section>
+
+</div>
+
+<script>
+const WA = "77071916789";
+
+const KINDS = [
+ {n:"Физическая энергия", short:"Физическая", hint:"тело, сон, питание, движение", qs:[
+  {t:"Мне тяжело вставать утром и нужно время на раскачку, даже если я спал достаточно", k:"тяжело вставать"},
+  {t:"Я часто пропускаю приёмы пищи и в целом питаюсь несбалансированно", k:"питание"},
+  {t:"Я редко делаю зарядку и разминку, большую часть времени провожу сидя", k:"нет зарядки, сидячий день"},
+  {t:"У меня есть одна или несколько вредных привычек", k:"вредные привычки"},
+  {t:"Я не хожу регулярно в зал, не делаю кардио- или силовых тренировок", k:"нет тренировок"},
+  {t:"В течение рабочего дня у меня редко есть возможность сделать перерыв и восстановиться", k:"нет перерывов в течение дня"},
+  {t:"Я часто слышу или знаю наверняка, что храплю во сне или сплю с открытым ртом", k:"храп"}]},
+ {n:"Эмоциональная энергия", short:"Эмоциональная", hint:"настроение, отношения, благодарность", qs:[
+  {t:"Я часто раздражаюсь или беспокоюсь на работе, особенно когда задача требует быстрого результата", k:"раздражение и тревога на работе"},
+  {t:"Мне не хватает позитивных эмоций, и я не знаю, как их получить", k:"не хватает позитивных эмоций"},
+  {t:"Я расстраиваюсь и злюсь, если не достигаю быстрых результатов", k:"злюсь без быстрого результата"},
+  {t:"Я редко нахожу время, чтобы выразить благодарность окружающим", k:"редко благодарит"},
+  {t:"Я редко помогаю людям бескорыстно, не ожидая ничего взамен", k:"редко помогает бескорыстно"},
+  {t:"Я редко уделяю время занятиям, которые дарят мне радость", k:"нет времени на радость"},
+  {t:"Мне сложно поверить в себя и продолжить действовать в сложных обстоятельствах", k:"трудно поверить в себя"}]},
+ {n:"Ментальная энергия", short:"Ментальная", hint:"внимание, фокус, восстановление головы", qs:[
+  {t:"У меня не получается выделять время в течение дня на небольшой отдых и перезагрузку", k:"нет перезагрузки днём"},
+  {t:"Во время важного дела я часто отвлекаюсь — особенно на уведомления и почту", k:"отвлекается на уведомления"},
+  {t:"У меня не получается выделять из списка дел то, что сейчас важно, и держать на этом фокус", k:"не держит фокус на главном"},
+  {t:"Мне трудно полностью расслабиться после тяжёлого рабочего дня", k:"не расслабляется после работы"},
+  {t:"Я мало размышляю и рефлексирую, редко планирую свою жизнь", k:"мало рефлексии и планирования"},
+  {t:"Я редко получаю и применяю новые инструменты или знания", k:"не применяет новое"},
+  {t:"Я редко трачу время на развлечения и не умею весело проводить время", k:"не умеет отдыхать весело"}]},
+ {n:"Духовная энергия", short:"Духовная", hint:"смысл, ценности, управление своей жизнью", qs:[
+  {t:"Я не чувствую, что делаю что-то важное и вношу вклад в изменения вокруг себя", k:"не чувствует своего вклада"},
+  {t:"Я не очень понимаю свою истинную цель и не чувствую принадлежности к чему-то большему", k:"не понимает своей цели"},
+  {t:"На мои решения часто влияют внешние обстоятельства: жизнь чаще управляет мной, чем я ей", k:"жизнь управляет им"},
+  {t:"Я чувствую расхождение между своими ценностями и тем, как поступаю на самом деле", k:"расхождение с ценностями"},
+  {t:"Я редко могу сам принимать решения, расставлять приоритеты и делать то, во что верю", k:"не решает сам"},
+  {t:"Мне сложно выделить в графике персональное время для себя", k:"нет времени на себя"},
+  {t:"Я не умею отдавать и не понимаю, чем могу быть полезен", k:"не умеет отдавать"}]}
+];
+const TOTAL = KINDS.reduce((n,k)=>n+k.qs.length, 0);
+
+const KEY = "energy-test-v1";
+let A = {}, step = 0;
+try{ A = JSON.parse(localStorage.getItem(KEY) || "{}") }catch(e){ A = {} }
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(A)) }catch(e){} };
+
+const $ = id => document.getElementById(id);
+const key = (k,q) => k + "-" + q;
+const kindYes = k => KINDS[k].qs.reduce((n,_,q)=> n + (A[key(k,q)] === 1 ? 1 : 0), 0);
+const allYes = () => KINDS.reduce((n,_,k)=> n + kindYes(k), 0);
+const doneKind = k => KINDS[k].qs.every((_,q)=> A[key(k,q)] != null);
+const leftAll = () => {
+  let n = 0;
+  KINDS.forEach((kd,k)=>kd.qs.forEach((_,q)=>{ if(A[key(k,q)] == null) n++ }));
+  return n;
+};
+
+function renderStep(){
+  const kd = KINDS[step];
+  $("kName").textContent = kd.n;
+  $("kStep").textContent = "Шаг " + (step+1) + " из 4";
+  $("kBar").style.width = Math.round(step/4*100) + "%";
+  const box = $("kBody");
+  box.textContent = "";
+  kd.qs.forEach((item,q)=>{
+    const id = key(step,q);
+    const card = document.createElement("div");
+    card.className = "q" + (A[id] === 1 ? " yes" : "");
+    const p = document.createElement("p");
+    p.textContent = item.t;
+    card.appendChild(p);
+    const opts = document.createElement("div");
+    opts.className = "opts";
+    [["Да",1],["Нет",0]].forEach(([label,val])=>{
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.type = "button";
+      b.id = id + "-" + val;
+      b.textContent = label;
+      b.setAttribute("aria-pressed", A[id] === val ? "true" : "false");
+      b.setAttribute("aria-label", item.t + " — " + label);
+      b.addEventListener("click", ()=>{
+        A[id] = val; save();
+        [...opts.children].forEach((o,i)=>o.setAttribute("aria-pressed", (i===0?1:0)===val?"true":"false"));
+        card.classList.toggle("yes", val === 1);
+        sync();
+      });
+      opts.appendChild(b);
+    });
+    card.appendChild(opts);
+    box.appendChild(card);
+  });
+  sync();
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+function sync(){
+  $("next").disabled = !doneKind(step);
+  $("next").textContent = step === 3 ? "Посмотреть результат" : "Дальше";
+  $("back").hidden = step === 0;
+  const l = leftAll();
+  $("left").textContent = l ? "осталось: " + l : "все утверждения отмечены";
+}
+
+function verdictFor(n){
+  if(n <= 8) return "Высокий уровень жизненной энергии. Провалов нет, но каждое отмеченное " +
+    "утверждение — это место, где можно добрать ещё.";
+  if(n <= 16) return "Существенный дефицит жизненной энергии. Сил хватает на обязательное, " +
+    "а на своё уже не остаётся. Пора пересматривать приоритеты и восстанавливать ресурс.";
+  return "Сильный дефицит жизненной энергии. В таком состоянии не работают ни планы, ни цели — " +
+    "сначала восстановление, всё остальное потом.";
+}
+
+function showResult(){
+  const t = allYes();
+  $("total").textContent = t;
+  $("verdict").textContent = verdictFor(t);
+
+  const box = $("kinds");
+  box.textContent = "";
+  const scores = KINDS.map((_,k)=>kindYes(k));
+  const worst = Math.max(...scores);
+  KINDS.forEach((kd,k)=>{
+    const v = scores[k];
+    const d = document.createElement("div");
+    d.className = "kind" + (v === worst && v > 0 ? " hot" : "");
+    const head = document.createElement("div");
+    head.className = "kHead";
+    const h = document.createElement("h3");
+    h.textContent = kd.n;
+    const b = document.createElement("b");
+    b.textContent = v + " из 7";
+    head.appendChild(h); head.appendChild(b);
+    const track = document.createElement("div");
+    track.className = "track";
+    const i = document.createElement("i");
+    i.style.width = Math.round(v/7*100) + "%";
+    track.appendChild(i);
+    const p = document.createElement("p");
+    p.textContent = (v === worst && v > 0 ? "Здесь утечек больше всего. " : "") + kd.hint;
+    d.appendChild(head); d.appendChild(track); d.appendChild(p);
+    box.appendChild(d);
+  });
+
+  const n10 = t % 10, n100 = t % 100;
+  const word = (n10 === 1 && n100 !== 11) ? "утечка"
+    : (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) ? "утечки" : "утечек";
+
+  const lines = ["Здравствуйте, Ерик! Прошёл тест на энергию.",
+    "", "Всего: " + t + " " + word + " из 28.", ""];
+  lines.push(KINDS.map((kd,k)=>kd.short + " " + scores[k] + "/7").join(" · "));
+  const marked = [];
+  KINDS.forEach((kd,k)=>{
+    const m = kd.qs.filter((_,q)=>A[key(k,q)] === 1).map(q=>q.k);
+    if(m.length) marked.push(kd.short + ": " + m.join(", "));
+  });
+  if(marked.length){
+    lines.push("", "Отмечено:");
+    marked.forEach(m=>lines.push("— " + m));
+  }
+  lines.push("", "Хочу разбор.");
+  const text = lines.join("\n");
+  $("msg").textContent = text;
+  $("wa").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(text);
+
+  $("quiz").hidden = true;
+  $("result").hidden = false;
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+$("start").addEventListener("click", ()=>{
+  $("intro").hidden = true;
+  $("quiz").hidden = false;
+  step = KINDS.findIndex((_,k)=>!doneKind(k));
+  if(step < 0) step = 0;
+  renderStep();
+});
+$("next").addEventListener("click", ()=>{
+  if(step === 3){ showResult(); return; }
+  step++; renderStep();
+});
+$("back").addEventListener("click", ()=>{ if(step > 0){ step--; renderStep(); } });
+$("again").addEventListener("click", ()=>{
+  A = {}; save(); step = 0;
+  $("result").hidden = true;
+  $("intro").hidden = false;
+  window.scrollTo({top:0, behavior:"instant"});
+});
+$("copy").addEventListener("click", ()=>{
+  const t = $("msg").textContent;
+  const done = ()=>{ $("copy").textContent = "Скопировано";
+    setTimeout(()=>$("copy").textContent = "Скопировать сообщение", 1800) };
+  const fallback = ()=>{
+    const r = document.createRange(); r.selectNodeContents($("msg"));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(done).catch(fallback);
+  } else fallback();
+});
+
+function nextSunday(){
+  const d = new Date(), day = d.getDay();
+  d.setDate(d.getDate() + (day === 0 ? 0 : 7 - day));
+  const m = ["января","февраля","марта","апреля","мая","июня",
+    "июля","августа","сентября","октября","ноября","декабря"];
+  return d.getDate() + " " + m[d.getMonth()];
+}
+$("deadline").textContent = "До воскресенья, " + nextSunday() +
+  ", разберу ваш результат и покажу три точки роста. Беру 5 человек в неделю.";
+</script>
+
+</body></html>

@@ -1,0 +1,393 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Как вы ставите цели</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Четыре экрана-блока, в конце две колонки счёта: стихийно против осознанно */
+:root{
+  --paper:#F4F1EB; --card:#FFFFFF; --line:#DDD5C8;
+  --ink:#19242B; --dim:#5E6A73;
+  --acc:#A3562C; --acc-soft:#F2E3D8; --acc-ink:#8C4825;
+  --cool:#3F6B7A; --cool-soft:#E3EDF1;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#141E26; --card:#1D2A33; --line:#33454F;
+    --ink:#F2EFE9; --dim:#9FB0BA;
+    --acc:#D98A5B; --acc-soft:#33231B; --acc-ink:#E8A478;
+    --cool:#7FAFC2; --cool-soft:#1C2E36;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141E26; --card:#1D2A33; --line:#33454F;
+  --ink:#F2EFE9; --dim:#9FB0BA;
+  --acc:#D98A5B; --acc-soft:#33231B; --acc-ink:#E8A478;
+  --cool:#7FAFC2; --cool-soft:#1C2E36;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{width:100%;max-width:680px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:28px 56px}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(30px,7vw,42px);line-height:1.1;
+  margin:0 0 14px;letter-spacing:-.015em;text-wrap:balance}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(24px,5.5vw,32px);line-height:1.15;
+  margin:0 0 6px;letter-spacing:-.01em;text-wrap:balance}
+p{margin:0 0 14px}
+p:last-child{margin-bottom:0}
+.lede{font-size:17px;color:var(--dim);max-width:60ch}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--acc);margin:0 0 10px}
+.note{margin-top:22px;padding:20px 22px;border-radius:14px;background:var(--card);
+  border:1px solid var(--line);font-size:15.5px;color:var(--dim)}
+
+.btn{appearance:none;border:0;cursor:pointer;font-family:var(--sans);font-weight:600;
+  font-size:16px;padding:15px 26px;border-radius:12px;background:var(--acc);color:#fff;
+  line-height:1.2}
+.btn:hover{background:var(--acc-ink)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--dim);border:1px solid var(--line);padding:15px 20px}
+.btn.ghost:hover{background:var(--card);color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px;align-items:center}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:10px}
+.step{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+.bar{height:4px;border-radius:2px;background:var(--line);overflow:hidden;margin-bottom:24px}
+.bar i{display:block;height:100%;background:var(--acc);transition:width .3s ease}
+
+.q{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:18px 18px 14px;margin-bottom:10px}
+.q.on{border-color:var(--acc)}
+.q p{font-size:15.5px;line-height:1.45;margin:0 0 14px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.opt{appearance:none;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:15px;
+  padding:12px 0;border-radius:10px;border:1px solid var(--line);background:transparent;
+  color:var(--ink);line-height:1.1}
+.opt:hover{border-color:var(--acc)}
+.opt[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.col{padding:22px 20px;border-radius:15px;border:1px solid var(--line);background:var(--card)}
+.col.hot{border-color:var(--acc);background:var(--acc-soft)}
+.col.cool{border-color:var(--cool);background:var(--cool-soft)}
+.col h3{font-family:var(--sans);font-size:13.5px;font-weight:600;margin:0 0 8px;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.08em}
+.col b{display:block;font-family:var(--serif);font-weight:700;line-height:.95;
+  font-size:clamp(42px,12vw,58px);font-variant-numeric:tabular-nums}
+.col.hot b{color:var(--acc)}
+.col.cool b{color:var(--cool)}
+.col span{display:block;font-size:14px;color:var(--dim);margin-top:8px}
+.verdict{margin-top:18px;padding:20px 22px;border-radius:14px;background:var(--acc-soft);
+  border:1px solid var(--acc);font-size:16px;line-height:1.5}
+
+.blocks{display:grid;gap:10px;margin-top:10px}
+.blk{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 18px}
+.bHead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:9px}
+.bHead h3{font-family:var(--sans);font-weight:600;font-size:15px;margin:0}
+.bHead span{font-size:14px;color:var(--dim);font-variant-numeric:tabular-nums}
+.split{display:flex;height:9px;border-radius:5px;overflow:hidden;background:var(--line)}
+.split i{display:block;height:100%}
+.split i.a{background:var(--acc)}
+.split i.b{background:var(--cool)}
+
+.cta{margin-top:34px;padding:26px 24px;border-radius:16px;background:var(--card);
+  border:1px solid var(--line)}
+.msg{margin-top:14px;padding:15px 17px;border-radius:11px;background:var(--paper);
+  border:1px dashed var(--line);font-size:15px;color:var(--dim);line-height:1.45;white-space:pre-line}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<section id="intro">
+  <p class="eyebrow">Личная эффективность и энергия</p>
+  <h1>Как вы ставите цели</h1>
+  <p class="lede">Сорок утверждений о том, откуда берутся ваши цели, как они выглядят и что из
+    них выходит. На каждое — «да» или «нет». Минут пять.</p>
+  <p class="lede" style="margin-top:14px">В конце вы увидите, чего в вашем подходе больше:
+    стихийности или осознанности. И на каком именно этапе всё рассыпается.</p>
+  <div class="note">Утверждения нарочно идут вперемешку, и среди них нет правильных.
+    Отмечайте то, что есть на самом деле.</div>
+  <div class="row"><button class="btn" id="start">Начать</button></div>
+</section>
+
+<section id="quiz" hidden>
+  <div class="top">
+    <p class="eyebrow" id="bName" style="margin:0"></p>
+    <span class="step" id="bStep"></span>
+  </div>
+  <div class="bar"><i id="bBar" style="width:0%"></i></div>
+  <div id="bBody"></div>
+  <div class="row">
+    <button class="btn" id="next" disabled>Дальше</button>
+    <button class="btn ghost" id="back">Назад</button>
+    <span class="step" id="left"></span>
+  </div>
+</section>
+
+<section id="result" hidden>
+  <p class="eyebrow">Результат</p>
+  <h2>Ваш подход к целям</h2>
+  <div class="duo">
+    <div class="col hot"><h3>Стихийно</h3><b id="sI">—</b><span>из 20 утверждений</span></div>
+    <div class="col cool"><h3>Осознанно</h3><b id="sO">—</b><span>из 20 утверждений</span></div>
+  </div>
+  <div class="verdict" id="verdict"></div>
+
+  <hr>
+
+  <h2>По этапам</h2>
+  <p class="lede">Видно, на каком этапе цель перестаёт быть управляемой.</p>
+  <div class="blocks" id="blocks"></div>
+
+  <div class="cta">
+    <h2 style="font-size:24px">Что с этим делать</h2>
+    <p style="color:var(--dim)">Цели срываются не от нехватки воли. Они срываются там, где у них
+      нет критериев, приоритета и недельного ритма — и это чинится инструментами, а не характером.</p>
+    <p style="color:var(--dim)">Я провожу разбор: час по зуму, смотрим ваш результат, находим
+      этап, на котором всё рассыпается, и собираем два-три шага на ближайшую неделю.</p>
+    <p id="deadline" style="font-weight:600"></p>
+    <div class="row" style="margin-top:20px">
+      <a class="btn" id="wa" href="#" target="_blank" rel="noopener">Написать в WhatsApp</a>
+      <button class="btn ghost" id="copy">Скопировать сообщение</button>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div class="row"><button class="btn ghost" id="again">Пройти заново</button></div>
+</section>
+
+</div>
+
+<script>
+const WA = "77071916789";
+
+// s: "i" — стихийный полюс, "o" — осознанный. В интерфейсе не показывается.
+const BLOCKS = [
+ {n:"Откуда берутся ваши цели", qs:[
+  {t:"Желания и хотелки", s:"i"},
+  {t:"Осуществление большой цели, миссии", s:"o"},
+  {t:"Требование обстоятельств и ситуации", s:"i"},
+  {t:"Осознание необходимости", s:"o"},
+  {t:"Кризис, авария, чрезвычайное происшествие", s:"i"},
+  {t:"Мечты", s:"o"},
+  {t:"Влияние других людей и общества", s:"i"},
+  {t:"Видение возможности", s:"o"}]},
+ {n:"Какие ваши цели", qs:[
+  {t:"Цели держатся в голове", s:"i"},
+  {t:"Цели написаны", s:"o"},
+  {t:"Они общие и расплывчатые", s:"i"},
+  {t:"Они конкретны", s:"o"},
+  {t:"Представления о цели примерные", s:"i"},
+  {t:"Параметры измеримы", s:"o"},
+  {t:"Нет чётких критериев", s:"i"},
+  {t:"Критерии цели чёткие", s:"o"},
+  {t:"Ресурсы обычно не учитываются", s:"i"},
+  {t:"Ресурсы учитываются", s:"o"},
+  {t:"Вероятность достижения неясна", s:"i"},
+  {t:"Цели достижимы", s:"o"},
+  {t:"Значимость цели непонятна", s:"i"},
+  {t:"Они значимы", s:"o"},
+  {t:"Даты обычно примерные", s:"i"},
+  {t:"Цели привязаны ко времени", s:"o"}]},
+ {n:"Как вы их планируете", qs:[
+  {t:"Цели размыты", s:"i"},
+  {t:"Цели структурированы", s:"o"},
+  {t:"Непонятна иерархия целей", s:"i"},
+  {t:"Иерархия целей понятна", s:"o"},
+  {t:"Полагание на случай", s:"i"},
+  {t:"Есть внутренняя логика", s:"o"},
+  {t:"Непонятно, какая цель главнее и важнее", s:"i"},
+  {t:"Есть грамотная система приоритетов", s:"o"},
+  {t:"Беспорядочное выполнение шагов", s:"i"},
+  {t:"Системная последовательность шагов", s:"o"},
+  {t:"Большие объёмы непонятной работы", s:"i"},
+  {t:"Короткие, понятные этапы и подцели", s:"o"}]},
+ {n:"Что получается", qs:[
+  {t:"Суета и отсутствие результата", s:"i"},
+  {t:"Предсказуемое достижение цели", s:"o"},
+  {t:"Неудача", s:"i"},
+  {t:"Достижение успеха", s:"o"}]}
+];
+
+const KEY = "goals-test-v1";
+let A = {}, step = 0;
+try{ A = JSON.parse(localStorage.getItem(KEY) || "{}") }catch(e){ A = {} }
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(A)) }catch(e){} };
+
+const $ = id => document.getElementById(id);
+const key = (b,q) => b + "-" + q;
+const doneBlock = b => BLOCKS[b].qs.every((_,q)=> A[key(b,q)] != null);
+const countSide = (side, blocks) => {
+  let n = 0;
+  (blocks ?? BLOCKS.map((_,i)=>i)).forEach(b=>BLOCKS[b].qs.forEach((q,qi)=>{
+    if(q.s === side && A[key(b,qi)] === 1) n++;
+  }));
+  return n;
+};
+const sideTotal = (side, b) => BLOCKS[b].qs.filter(q=>q.s===side).length;
+const leftAll = () => {
+  let n = 0;
+  BLOCKS.forEach((bl,b)=>bl.qs.forEach((_,q)=>{ if(A[key(b,q)] == null) n++ }));
+  return n;
+};
+
+function renderStep(){
+  const bl = BLOCKS[step];
+  $("bName").textContent = bl.n;
+  $("bStep").textContent = "Шаг " + (step+1) + " из 4";
+  $("bBar").style.width = Math.round(step/4*100) + "%";
+  const box = $("bBody");
+  box.textContent = "";
+  bl.qs.forEach((q,qi)=>{
+    const id = key(step,qi);
+    const card = document.createElement("div");
+    card.className = "q" + (A[id] === 1 ? " on" : "");
+    const p = document.createElement("p");
+    p.textContent = q.t;
+    card.appendChild(p);
+    const opts = document.createElement("div");
+    opts.className = "opts";
+    [["Да",1],["Нет",0]].forEach(([label,val])=>{
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.type = "button";
+      b.id = id + "-" + val;
+      b.textContent = label;
+      b.setAttribute("aria-pressed", A[id] === val ? "true" : "false");
+      b.setAttribute("aria-label", q.t + " — " + label);
+      b.addEventListener("click", ()=>{
+        A[id] = val; save();
+        [...opts.children].forEach((o,i)=>o.setAttribute("aria-pressed",(i===0?1:0)===val?"true":"false"));
+        card.classList.toggle("on", val === 1);
+        sync();
+      });
+      opts.appendChild(b);
+    });
+    card.appendChild(opts);
+    box.appendChild(card);
+  });
+  sync();
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+function sync(){
+  $("next").disabled = !doneBlock(step);
+  $("next").textContent = step === 3 ? "Посмотреть результат" : "Дальше";
+  $("back").hidden = step === 0;
+  const l = leftAll();
+  $("left").textContent = l ? "осталось: " + l : "все утверждения отмечены";
+}
+
+function verdictFor(i,o){
+  if(o - i >= 6) return "Цели вы ставите скорее осознанно: они записаны, измеримы и привязаны " +
+    "ко времени. Отмеченные стихийные пункты — это те места, где система ещё даёт сбой.";
+  if(i - o >= 6) return "Цели у вас рождаются скорее стихийно: из обстоятельств, чужих ожиданий " +
+    "и желаний момента. Такие цели не выживают дольше нескольких недель — не из-за воли, " +
+    "а потому что им не за что держаться.";
+  return "Подход смешанный: часть целей вы ведёте осознанно, часть живёт сама по себе. " +
+    "Обычно это значит, что инструменты вы знаете, но применяете не ко всему.";
+}
+
+function showResult(){
+  const I = countSide("i"), O = countSide("o");
+  $("sI").textContent = I;
+  $("sO").textContent = O;
+  $("verdict").textContent = verdictFor(I,O);
+
+  const box = $("blocks");
+  box.textContent = "";
+  BLOCKS.forEach((bl,b)=>{
+    const i = countSide("i",[b]), o = countSide("o",[b]);
+    const ti = sideTotal("i",b), to = sideTotal("o",b);
+    const d = document.createElement("div");
+    d.className = "blk";
+    const head = document.createElement("div");
+    head.className = "bHead";
+    const h = document.createElement("h3");
+    h.textContent = bl.n;
+    const sp = document.createElement("span");
+    sp.textContent = "стихийно " + i + " из " + ti + " · осознанно " + o + " из " + to;
+    head.appendChild(h); head.appendChild(sp);
+    const split = document.createElement("div");
+    split.className = "split";
+    const sum = i + o;
+    const a = document.createElement("i"); a.className = "a";
+    a.style.width = sum ? Math.round(i/sum*100) + "%" : "0%";
+    const bb = document.createElement("i"); bb.className = "b";
+    bb.style.width = sum ? Math.round(o/sum*100) + "%" : "0%";
+    split.appendChild(a); split.appendChild(bb);
+    d.appendChild(head); d.appendChild(split);
+    box.appendChild(d);
+  });
+
+  const SHORT = ["Откуда цели","Какие цели","Как планирую","Что получается"];
+  const lines = [];
+  BLOCKS.forEach((bl,b)=>{
+    lines.push("", bl.n.toUpperCase() + " (стихийно " + countSide("i",[b]) + "/" +
+      sideTotal("i",b) + ", осознанно " + countSide("o",[b]) + "/" + sideTotal("o",b) + ")");
+    bl.qs.forEach((q,qi)=>{
+      lines.push((A[key(b,qi)] === 1 ? "✅ Да — " : "▫️ Нет — ") + q.t);
+    });
+  });
+  const text = "Здравствуйте, Ерик! Прошёл тест про цели: стихийно " + I +
+    ", осознанно " + O + ".\n" + lines.join("\n") + "\n\nХочу разбор.";
+  $("msg").textContent = text;
+  $("wa").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(text);
+
+  $("quiz").hidden = true;
+  $("result").hidden = false;
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+$("start").addEventListener("click", ()=>{
+  $("intro").hidden = true;
+  $("quiz").hidden = false;
+  step = BLOCKS.findIndex((_,b)=>!doneBlock(b));
+  if(step < 0) step = 0;
+  renderStep();
+});
+$("next").addEventListener("click", ()=>{
+  if(step === 3){ showResult(); return; }
+  step++; renderStep();
+});
+$("back").addEventListener("click", ()=>{ if(step > 0){ step--; renderStep(); } });
+$("again").addEventListener("click", ()=>{
+  A = {}; save(); step = 0;
+  $("result").hidden = true;
+  $("intro").hidden = false;
+  window.scrollTo({top:0, behavior:"instant"});
+});
+$("copy").addEventListener("click", ()=>{
+  const t = $("msg").textContent;
+  const done = ()=>{ $("copy").textContent = "Скопировано";
+    setTimeout(()=>$("copy").textContent = "Скопировать сообщение", 1800) };
+  const fallback = ()=>{
+    const r = document.createRange(); r.selectNodeContents($("msg"));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(done).catch(fallback);
+  } else fallback();
+});
+
+function nextSunday(){
+  const d = new Date(), day = d.getDay();
+  d.setDate(d.getDate() + (day === 0 ? 0 : 7 - day));
+  const m = ["января","февраля","марта","апреля","мая","июня",
+    "июля","августа","сентября","октября","ноября","декабря"];
+  return d.getDate() + " " + m[d.getMonth()];
+}
+$("deadline").textContent = "До воскресенья, " + nextSunday() +
+  ", разберу ваш результат и покажу три точки роста. Беру 5 человек в неделю.";
+</script>
+
+</body></html>
