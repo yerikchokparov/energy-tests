@@ -67,10 +67,20 @@ p:last-child{margin-bottom:0}
 .q.on{border-color:var(--acc)}
 .q p{font-size:15.5px;line-height:1.45;margin:0 0 14px}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.pq{font-family:var(--serif);font-weight:600;font-size:17px}
-.pair{text-align:left;padding:12px 13px;font-weight:500;font-size:14.5px;line-height:1.35;display:flex;flex-direction:column;gap:6px}
-.pair small{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
-.pair[aria-pressed="true"] small{color:#fff;opacity:.85}
+.pq{font-family:var(--serif);font-weight:600;font-size:19px;margin:0 0 12px}
+.heads{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:9px;
+  padding:10px 0 8px;margin-bottom:4px;background:var(--paper)}
+.heads div{font-size:12.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  padding:8px 10px;border-radius:9px;text-align:center}
+.heads .hi{background:var(--acc-soft);color:var(--acc-ink)}
+.heads .ho{background:var(--cool-soft);color:var(--cool)}
+.q{padding:10px}
+.pair{text-align:left;padding:12px 12px 13px;display:flex;flex-direction:column;gap:5px;line-height:1.25}
+.pair b{font-size:16px;font-weight:700;color:var(--ink)}
+.pair em{font-size:13px;font-weight:400;font-style:italic;color:var(--dim);line-height:1.35}
+.pair.i{border-left:4px solid var(--acc)}
+.pair.o{border-left:4px solid var(--cool)}
+.pair[aria-pressed="true"] b,.pair[aria-pressed="true"] em{color:#fff}
 .pair.o[aria-pressed="true"]{background:var(--cool);border-color:var(--cool)}
 .pair.o:hover{border-color:var(--cool)}
 .q.on{border-color:var(--line)}
@@ -180,29 +190,30 @@ const WA = "77071916789";
 // В каждой паре: i — на автопилоте, o — осознанно. Ответ: 'i' или 'o'.
 const BLOCKS = [
  {n:"Откуда берутся ваши цели", q:"Чаще всего мои цели появляются из…", qs:[
-  {i:"Желаний и хотелок: захотелось — и всё. «Хочу новый айфон, потому что вышел»", o:"Большой цели, миссии: это нужно для дела. «Я мобилограф — беру телефон с памятью побольше, не обязательно последний»"},
-  {i:"Требования обстоятельств: так сложилось, деваться некуда", o:"Осознания необходимости: сам понял, зачем это нужно"},
-  {i:"Кризиса, аварии, ЧП: когда уже припекло", o:"Мечты: то, к чему хочу прийти"},
-  {i:"Влияния других людей и общества: «у всех есть, и мне надо»", o:"Видения возможности: вижу, что могу, и иду"}]},
+  {i:["Желания и хотелки","захотелось — и всё: «хочу новый айфон, потому что вышел»"],
+   o:["Большая цель, миссия","нужно для дела: «я мобилограф — беру телефон с памятью побольше, не обязательно последний»"]},
+  {i:["Требование обстоятельств","так сложилось, деваться некуда"], o:["Осознание необходимости","сам понял, зачем это нужно"]},
+  {i:["Кризис, авария, ЧП","когда уже припекло"], o:["Мечты","то, к чему хочу прийти"]},
+  {i:["Влияние других людей","«у всех есть, и мне надо»"], o:["Видение возможности","вижу, что могу, — и иду"]}]},
  {n:"Какие ваши цели", q:"Мои цели обычно…", qs:[
-  {i:"Держатся в голове", o:"Записаны"},
-  {i:"Общие и расплывчатые", o:"Конкретные"},
-  {i:"Представление о цели примерное", o:"Параметры измеримы: сколько, чего, какого качества"},
-  {i:"Нет чётких критериев, когда цель достигнута", o:"Критерии чёткие: понятно, когда цель достигнута"},
-  {i:"Ресурсы не учитываю: деньги, время, силы", o:"Ресурсы учитываю заранее"},
-  {i:"Непонятно, достижима ли цель", o:"Цель достижима, я в неё верю"},
-  {i:"Непонятно, зачем мне эта цель", o:"Цель значима для меня"},
-  {i:"Даты примерные: «когда-нибудь», «в этом году»", o:"Привязаны ко времени: конкретный срок"}]},
+  {i:["В голове",""], o:["Записаны",""]},
+  {i:["Общие, расплывчатые","«хочу больше денег»"], o:["Конкретные","«доход 800 тысяч в месяц»"]},
+  {i:["Примерные","представление о результате смутное"], o:["Измеримые","понятно сколько, чего, какого качества"]},
+  {i:["Без критериев","непонятно, когда цель достигнута"], o:["С чёткими критериями","ясно, когда цель достигнута"]},
+  {i:["Без учёта ресурсов","деньги, время и силы не считаю"], o:["С учётом ресурсов","заранее считаю деньги, время, силы"]},
+  {i:["Под вопросом","непонятно, достижима ли"], o:["Достижимые","верю, что дойду"]},
+  {i:["Непонятно зачем","значимость цели неясна"], o:["Значимые","понимаю, ради чего"]},
+  {i:["Без сроков","«когда-нибудь», «в этом году»"], o:["Со сроками","конкретная дата"]}]},
  {n:"Как вы их планируете", q:"Когда я иду к цели…", qs:[
-  {i:"Цели размыты и перемешаны", o:"Цели структурированы"},
-  {i:"Непонятно, какая цель из какой вытекает", o:"Иерархия понятна: большая цель → подцели"},
-  {i:"Полагаюсь на случай", o:"Есть внутренняя логика и план"},
-  {i:"Непонятно, какая цель главнее", o:"Есть система приоритетов"},
-  {i:"Шаги выполняю беспорядочно", o:"Шаги идут в системной последовательности"},
-  {i:"Передо мной большой объём непонятной работы", o:"Короткие понятные этапы и подцели"}]},
+  {i:["Цели размыты","всё перемешано"], o:["Цели структурированы","разложены по полочкам"]},
+  {i:["Нет иерархии","непонятно, что из чего вытекает"], o:["Есть иерархия","большая цель → подцели"]},
+  {i:["Полагаюсь на случай",""], o:["Есть логика и план",""]},
+  {i:["Нет приоритетов","непонятно, что главнее"], o:["Есть приоритеты","знаю, что делать первым"]},
+  {i:["Шаги вразнобой",""], o:["Шаги по порядку",""]},
+  {i:["Большой непонятный объём","не знаю, с чего начать"], o:["Короткие этапы","понятные подцели и шаги"]}]},
  {n:"Что получается", q:"В итоге чаще всего…", qs:[
-  {i:"Суета, а результата нет", o:"Предсказуемо достигаю цели"},
-  {i:"Неудача, бросаю на полпути", o:"Успех, довожу до конца"}]}
+  {i:["Суета без результата",""], o:["Предсказуемый результат",""]},
+  {i:["Бросаю на полпути",""], o:["Довожу до конца",""]}]}
 ];
 
 const KEY = "goals-test-v2";
@@ -238,20 +249,25 @@ function renderStep(){
   lead.className = "pq";
   lead.textContent = bl.q;
   box.appendChild(lead);
+  const heads = document.createElement("div");
+  heads.className = "heads";
+  heads.innerHTML = '<div class="hi">На автопилоте</div><div class="ho">Осознанно</div>';
+  box.appendChild(heads);
   bl.qs.forEach((q,qi)=>{
     const id = key(step,qi);
     const card = document.createElement("div");
     card.className = "q";
     const opts = document.createElement("div");
     opts.className = "opts";
-    [["На автопилоте",q.i,"i"],["Осознанно",q.o,"o"]].forEach(([tag,text,val])=>{
+    [["На автопилоте",q.i,"i"],["Осознанно",q.o,"o"]].forEach(([tag,[title,hint],val])=>{
       const b = document.createElement("button");
       b.className = "opt pair " + val;
       b.type = "button";
       b.id = id + "-" + val;
-      const sm = document.createElement("small"); sm.textContent = tag;
-      const tx = document.createElement("span"); tx.textContent = text;
-      b.appendChild(sm); b.appendChild(tx);
+      const tb = document.createElement("b"); tb.textContent = title;
+      b.appendChild(tb);
+      if(hint){ const em = document.createElement("em"); em.textContent = hint; b.appendChild(em); }
+      b.setAttribute("aria-label", tag + ": " + title + (hint ? ". " + hint : ""));
       b.setAttribute("aria-pressed", A[id] === val ? "true" : "false");
       b.addEventListener("click", ()=>{
         A[id] = val; save();
@@ -323,7 +339,7 @@ function showResult(){
     lines.push("", bl.n.toUpperCase() + " (автопилот " + countSide("i",[b]) + ", осознанно " +
       countSide("o",[b]) + " из " + sideTotal("i",b) + ")");
     bl.qs.forEach((q,qi)=>{
-      lines.push(A[key(b,qi)] === "o" ? "🔵 Осознанно — " + q.o : "🟠 Автопилот — " + q.i);
+      lines.push(A[key(b,qi)] === "o" ? "🔵 Осознанно — " + q.o[0] : "🟠 Автопилот — " + q.i[0]);
     });
   });
   const text = "Здравствуйте, Ерик! Прошёл тест про цели: на автопилоте " + I +
