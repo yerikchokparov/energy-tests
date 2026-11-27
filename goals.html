@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Четыре экрана-блока, в конце две колонки счёта: стихийно против осознанно */
+/* Четыре экрана-блока, в каждом вопросе выбор из пары: на автопилоте или осознанно */
 :root{
   --paper:#F4F1EB; --card:#FFFFFF; --line:#DDD5C8;
   --ink:#19242B; --dim:#5E6A73;
@@ -67,6 +67,13 @@ p:last-child{margin-bottom:0}
 .q.on{border-color:var(--acc)}
 .q p{font-size:15.5px;line-height:1.45;margin:0 0 14px}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.pq{font-family:var(--serif);font-weight:600;font-size:17px}
+.pair{text-align:left;padding:12px 13px;font-weight:500;font-size:14.5px;line-height:1.35;display:flex;flex-direction:column;gap:6px}
+.pair small{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.pair[aria-pressed="true"] small{color:#fff;opacity:.85}
+.pair.o[aria-pressed="true"]{background:var(--cool);border-color:var(--cool)}
+.pair.o:hover{border-color:var(--cool)}
+.q.on{border-color:var(--line)}
 .opt{appearance:none;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:15px;
   padding:12px 0;border-radius:10px;border:1px solid var(--line);background:transparent;
   color:var(--ink);line-height:1.1}
@@ -110,12 +117,12 @@ hr{border:0;border-top:1px solid var(--line);margin:34px 0}
 <section id="intro">
   <p class="eyebrow">Личная эффективность и энергия</p>
   <h1>Как вы ставите цели</h1>
-  <p class="lede">Сорок утверждений о том, откуда берутся ваши цели, как они выглядят и что из
-    них выходит. На каждое — «да» или «нет». Минут пять.</p>
+  <p class="lede">Двадцать пар утверждений о том, откуда берутся ваши цели, как они выглядят и что из
+    них выходит. В каждой паре выберите то, что ближе к вам. Минут пять.</p>
   <p class="lede" style="margin-top:14px">В конце вы увидите, чего в вашем подходе больше:
-    стихийности или осознанности. И на каком именно этапе всё рассыпается.</p>
-  <div class="note">Утверждения нарочно идут вперемешку, и среди них нет правильных.
-    Отмечайте то, что есть на самом деле.</div>
+    жизни на автопилоте или осознанности. И на каком именно этапе всё рассыпается.</p>
+  <div class="note">Выбирайте не «как правильно», а как бывает у вас чаще всего.
+    Честный ответ полезнее красивого.</div>
   <div class="row"><button class="btn" id="start">Начать</button></div>
 </section>
 
@@ -137,8 +144,8 @@ hr{border:0;border-top:1px solid var(--line);margin:34px 0}
   <p class="eyebrow">Результат</p>
   <h2>Ваш подход к целям</h2>
   <div class="duo">
-    <div class="col hot"><h3>Стихийно</h3><b id="sI">—</b><span>из 20 утверждений</span></div>
-    <div class="col cool"><h3>Осознанно</h3><b id="sO">—</b><span>из 20 утверждений</span></div>
+    <div class="col hot"><h3>На автопилоте</h3><b id="sI">—</b><span>из 20 пар</span></div>
+    <div class="col cool"><h3>Осознанно</h3><b id="sO">—</b><span>из 20 пар</span></div>
   </div>
   <div class="verdict" id="verdict"></div>
 
@@ -170,55 +177,35 @@ hr{border:0;border-top:1px solid var(--line);margin:34px 0}
 <script>
 const WA = "77071916789";
 
-// s: "i" — стихийный полюс, "o" — осознанный. В интерфейсе не показывается.
+// В каждой паре: i — на автопилоте, o — осознанно. Ответ: 'i' или 'o'.
 const BLOCKS = [
- {n:"Откуда берутся ваши цели", qs:[
-  {t:"Желания и хотелки", s:"i"},
-  {t:"Осуществление большой цели, миссии", s:"o"},
-  {t:"Требование обстоятельств и ситуации", s:"i"},
-  {t:"Осознание необходимости", s:"o"},
-  {t:"Кризис, авария, чрезвычайное происшествие", s:"i"},
-  {t:"Мечты", s:"o"},
-  {t:"Влияние других людей и общества", s:"i"},
-  {t:"Видение возможности", s:"o"}]},
- {n:"Какие ваши цели", qs:[
-  {t:"Цели держатся в голове", s:"i"},
-  {t:"Цели написаны", s:"o"},
-  {t:"Они общие и расплывчатые", s:"i"},
-  {t:"Они конкретны", s:"o"},
-  {t:"Представления о цели примерные", s:"i"},
-  {t:"Параметры измеримы", s:"o"},
-  {t:"Нет чётких критериев", s:"i"},
-  {t:"Критерии цели чёткие", s:"o"},
-  {t:"Ресурсы обычно не учитываются", s:"i"},
-  {t:"Ресурсы учитываются", s:"o"},
-  {t:"Вероятность достижения неясна", s:"i"},
-  {t:"Цели достижимы", s:"o"},
-  {t:"Значимость цели непонятна", s:"i"},
-  {t:"Они значимы", s:"o"},
-  {t:"Даты обычно примерные", s:"i"},
-  {t:"Цели привязаны ко времени", s:"o"}]},
- {n:"Как вы их планируете", qs:[
-  {t:"Цели размыты", s:"i"},
-  {t:"Цели структурированы", s:"o"},
-  {t:"Непонятна иерархия целей", s:"i"},
-  {t:"Иерархия целей понятна", s:"o"},
-  {t:"Полагание на случай", s:"i"},
-  {t:"Есть внутренняя логика", s:"o"},
-  {t:"Непонятно, какая цель главнее и важнее", s:"i"},
-  {t:"Есть грамотная система приоритетов", s:"o"},
-  {t:"Беспорядочное выполнение шагов", s:"i"},
-  {t:"Системная последовательность шагов", s:"o"},
-  {t:"Большие объёмы непонятной работы", s:"i"},
-  {t:"Короткие, понятные этапы и подцели", s:"o"}]},
- {n:"Что получается", qs:[
-  {t:"Суета и отсутствие результата", s:"i"},
-  {t:"Предсказуемое достижение цели", s:"o"},
-  {t:"Неудача", s:"i"},
-  {t:"Достижение успеха", s:"o"}]}
+ {n:"Откуда берутся ваши цели", q:"Чаще всего мои цели появляются из…", qs:[
+  {i:"Желаний и хотелок: захотелось — и всё. «Хочу новый айфон, потому что вышел»", o:"Большой цели, миссии: это нужно для дела. «Я мобилограф — беру телефон с памятью побольше, не обязательно последний»"},
+  {i:"Требования обстоятельств: так сложилось, деваться некуда", o:"Осознания необходимости: сам понял, зачем это нужно"},
+  {i:"Кризиса, аварии, ЧП: когда уже припекло", o:"Мечты: то, к чему хочу прийти"},
+  {i:"Влияния других людей и общества: «у всех есть, и мне надо»", o:"Видения возможности: вижу, что могу, и иду"}]},
+ {n:"Какие ваши цели", q:"Мои цели обычно…", qs:[
+  {i:"Держатся в голове", o:"Записаны"},
+  {i:"Общие и расплывчатые", o:"Конкретные"},
+  {i:"Представление о цели примерное", o:"Параметры измеримы: сколько, чего, какого качества"},
+  {i:"Нет чётких критериев, когда цель достигнута", o:"Критерии чёткие: понятно, когда цель достигнута"},
+  {i:"Ресурсы не учитываю: деньги, время, силы", o:"Ресурсы учитываю заранее"},
+  {i:"Непонятно, достижима ли цель", o:"Цель достижима, я в неё верю"},
+  {i:"Непонятно, зачем мне эта цель", o:"Цель значима для меня"},
+  {i:"Даты примерные: «когда-нибудь», «в этом году»", o:"Привязаны ко времени: конкретный срок"}]},
+ {n:"Как вы их планируете", q:"Когда я иду к цели…", qs:[
+  {i:"Цели размыты и перемешаны", o:"Цели структурированы"},
+  {i:"Непонятно, какая цель из какой вытекает", o:"Иерархия понятна: большая цель → подцели"},
+  {i:"Полагаюсь на случай", o:"Есть внутренняя логика и план"},
+  {i:"Непонятно, какая цель главнее", o:"Есть система приоритетов"},
+  {i:"Шаги выполняю беспорядочно", o:"Шаги идут в системной последовательности"},
+  {i:"Передо мной большой объём непонятной работы", o:"Короткие понятные этапы и подцели"}]},
+ {n:"Что получается", q:"В итоге чаще всего…", qs:[
+  {i:"Суета, а результата нет", o:"Предсказуемо достигаю цели"},
+  {i:"Неудача, бросаю на полпути", o:"Успех, довожу до конца"}]}
 ];
 
-const KEY = "goals-test-v1";
+const KEY = "goals-test-v2";
 let A = {}, step = 0;
 try{ A = JSON.parse(localStorage.getItem(KEY) || "{}") }catch(e){ A = {} }
 const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(A)) }catch(e){} };
@@ -229,11 +216,11 @@ const doneBlock = b => BLOCKS[b].qs.every((_,q)=> A[key(b,q)] != null);
 const countSide = (side, blocks) => {
   let n = 0;
   (blocks ?? BLOCKS.map((_,i)=>i)).forEach(b=>BLOCKS[b].qs.forEach((q,qi)=>{
-    if(q.s === side && A[key(b,qi)] === 1) n++;
+    if(A[key(b,qi)] === side) n++;
   }));
   return n;
 };
-const sideTotal = (side, b) => BLOCKS[b].qs.filter(q=>q.s===side).length;
+const sideTotal = (side, b) => BLOCKS[b].qs.length;
 const leftAll = () => {
   let n = 0;
   BLOCKS.forEach((bl,b)=>bl.qs.forEach((_,q)=>{ if(A[key(b,q)] == null) n++ }));
@@ -247,27 +234,28 @@ function renderStep(){
   $("bBar").style.width = Math.round(step/4*100) + "%";
   const box = $("bBody");
   box.textContent = "";
+  const lead = document.createElement("p");
+  lead.className = "pq";
+  lead.textContent = bl.q;
+  box.appendChild(lead);
   bl.qs.forEach((q,qi)=>{
     const id = key(step,qi);
     const card = document.createElement("div");
-    card.className = "q" + (A[id] === 1 ? " on" : "");
-    const p = document.createElement("p");
-    p.textContent = q.t;
-    card.appendChild(p);
+    card.className = "q";
     const opts = document.createElement("div");
     opts.className = "opts";
-    [["Да",1],["Нет",0]].forEach(([label,val])=>{
+    [["На автопилоте",q.i,"i"],["Осознанно",q.o,"o"]].forEach(([tag,text,val])=>{
       const b = document.createElement("button");
-      b.className = "opt";
+      b.className = "opt pair " + val;
       b.type = "button";
       b.id = id + "-" + val;
-      b.textContent = label;
+      const sm = document.createElement("small"); sm.textContent = tag;
+      const tx = document.createElement("span"); tx.textContent = text;
+      b.appendChild(sm); b.appendChild(tx);
       b.setAttribute("aria-pressed", A[id] === val ? "true" : "false");
-      b.setAttribute("aria-label", q.t + " — " + label);
       b.addEventListener("click", ()=>{
         A[id] = val; save();
-        [...opts.children].forEach((o,i)=>o.setAttribute("aria-pressed",(i===0?1:0)===val?"true":"false"));
-        card.classList.toggle("on", val === 1);
+        [...opts.children].forEach(o=>o.setAttribute("aria-pressed", o.id.endsWith("-"+val) ? "true" : "false"));
         sync();
       });
       opts.appendChild(b);
@@ -284,13 +272,13 @@ function sync(){
   $("next").textContent = step === 3 ? "Посмотреть результат" : "Дальше";
   $("back").hidden = step === 0;
   const l = leftAll();
-  $("left").textContent = l ? "осталось: " + l : "все утверждения отмечены";
+  $("left").textContent = l ? "осталось пар: " + l : "все пары отмечены";
 }
 
 function verdictFor(i,o){
   if(o - i >= 6) return "Цели вы ставите скорее осознанно: они записаны, измеримы и привязаны " +
-    "ко времени. Отмеченные стихийные пункты — это те места, где система ещё даёт сбой.";
-  if(i - o >= 6) return "Цели у вас рождаются скорее стихийно: из обстоятельств, чужих ожиданий " +
+    "ко времени. Пары, где вы выбрали автопилот, — это места, где система ещё даёт сбой.";
+  if(i - o >= 6) return "Цели у вас рождаются скорее на автопилоте: из обстоятельств, чужих ожиданий " +
     "и желаний момента. Такие цели не выживают дольше нескольких недель — не из-за воли, " +
     "а потому что им не за что держаться.";
   return "Подход смешанный: часть целей вы ведёте осознанно, часть живёт сама по себе. " +
@@ -315,7 +303,7 @@ function showResult(){
     const h = document.createElement("h3");
     h.textContent = bl.n;
     const sp = document.createElement("span");
-    sp.textContent = "стихийно " + i + " из " + ti + " · осознанно " + o + " из " + to;
+    sp.textContent = "автопилот " + i + " · осознанно " + o + " из " + ti;
     head.appendChild(h); head.appendChild(sp);
     const split = document.createElement("div");
     split.className = "split";
@@ -332,13 +320,13 @@ function showResult(){
   const SHORT = ["Откуда цели","Какие цели","Как планирую","Что получается"];
   const lines = [];
   BLOCKS.forEach((bl,b)=>{
-    lines.push("", bl.n.toUpperCase() + " (стихийно " + countSide("i",[b]) + "/" +
-      sideTotal("i",b) + ", осознанно " + countSide("o",[b]) + "/" + sideTotal("o",b) + ")");
+    lines.push("", bl.n.toUpperCase() + " (автопилот " + countSide("i",[b]) + ", осознанно " +
+      countSide("o",[b]) + " из " + sideTotal("i",b) + ")");
     bl.qs.forEach((q,qi)=>{
-      lines.push((A[key(b,qi)] === 1 ? "✅ Да — " : "▫️ Нет — ") + q.t);
+      lines.push(A[key(b,qi)] === "o" ? "🔵 Осознанно — " + q.o : "🟠 Автопилот — " + q.i);
     });
   });
-  const text = "Здравствуйте, Ерик! Прошёл тест про цели: стихийно " + I +
+  const text = "Здравствуйте, Ерик! Прошёл тест про цели: на автопилоте " + I +
     ", осознанно " + O + ".\n" + lines.join("\n") + "\n\nХочу разбор.";
   $("msg").textContent = text;
   $("wa").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(text);
